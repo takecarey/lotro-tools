@@ -160,7 +160,7 @@ const StatCalculator: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/data/lotro-stats.csv');
+        const response = await fetch('/lotro-tools/data/lotro-stats.csv');
         const text = await response.text();
         
         const parsedData = Papa.parse<StatsDataRow>(text, {

@@ -203,7 +203,7 @@ const ItemComparison: React.FC = () => {
   useEffect(() => {
     const loadStatsData = async () => {
       try {
-        const response = await fetch('/data/lotro-stats.csv');
+        const response = await fetch('/lotro-tools/data/lotro-stats.csv');
         const text = await response.text();
         
         const parsed = Papa.parse<StatsDataRow>(text, {
