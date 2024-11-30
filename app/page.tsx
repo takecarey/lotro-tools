@@ -1,5 +1,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'LOTRO Tools - Main',
+  description: 'LOTRO Tools - Main',
+};
 
 export default function Home() {
   return (
