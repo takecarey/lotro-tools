@@ -2,7 +2,7 @@
 const nextConfig = {
     output: 'export', // Enables static export
     basePath: '/lotro-tools', // Match your GitHub Pages repo name
-    assetPrefix: '/lotro-tools', // Ensures CSS/JS chunks are resolved correctly
+    assetPrefix: '/lotro-tools/', // Ensures CSS/JS chunks are resolved correctly
       images: {
       unoptimized: true, // Required for static export on GitHub Pages
     },

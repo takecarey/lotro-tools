@@ -163,14 +163,11 @@ const StatCalculator: React.FC = () => {
         const response = await fetch('/data/lotro-stats.csv');
         const text = await response.text();
         
-        const parsedData = await new Promise<StatsDataRow[]>((resolve) => {
-          const parsed = window.Papa.parse(text, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            complete: (result) => resolve(result.data as StatsDataRow[])
-          });
-        });
+        const parsedData = Papa.parse<StatsDataRow>(text, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true
+        }).data;
         
         const classList = Object.keys(parsedData[0]).slice(2);
         
@@ -187,7 +184,7 @@ const StatCalculator: React.FC = () => {
         console.error('Error reading file:', error);
       }
     };
-
+  
     fetchData();
   }, []);
 
