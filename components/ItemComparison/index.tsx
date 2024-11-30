@@ -163,13 +163,32 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({ derivedStats, selec
     const differences: Record<string, number> = {};
     
     if (derivedStats) {
-      Object.keys(derivedStats).forEach(stat => {
-        differences[stat] = derivedStats[stat];
+      // Only include stats where the difference is not 0
+      Object.entries(derivedStats).forEach(([stat, value]) => {
+        if (value !== 0) {
+          differences[stat] = value;
+        }
       });
     }
 
     return differences;
   }, [derivedStats]);
+
+  // Only render if there are differences to show
+  if (Object.keys(statDifferences).length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{selectedClass} Raw Stat Differences</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500">
+            No stat differences between items
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -283,29 +302,52 @@ const ItemComparison: React.FC = () => {
   // Calculate derived stats differences with selected class
   const calculateDerivedStats = useMemo(() => {
     if (!statsData.length || !selectedClass) return {};
-
+  
     const derivedDifferences: Record<string, number> = {};
-
-    item1Stats.forEach(stat1 => {
-      const matchingStat2 = item2Stats.find(s => s.type === stat1.type);
-      if (matchingStat2 && stat1.type) {
-        const statDiff = Number(matchingStat2.value) - Number(stat1.value);
-        
-        statsData.forEach(row => {
-          if (row['Primary Stat'] === stat1.type) {
-            const derivedStat = row['Derived Stat'];
-            const multiplier = Number(row[selectedClass]) || 0;
-            
-            if (!derivedDifferences[derivedStat]) {
-              derivedDifferences[derivedStat] = 0;
-            }
-            derivedDifferences[derivedStat] += statDiff * multiplier;
-          }
-        });
-      }
+  
+    // Initialize all derived stats to 0
+    const allDerivedStats = [...new Set(statsData.map(row => row['Derived Stat']))];
+    allDerivedStats.forEach(derivedStat => {
+      derivedDifferences[derivedStat] = 0;
     });
-
-    return derivedDifferences;
+  
+    // Helper function to process a stat and its value
+    const processStat = (statType: string, value: number, isNegative: boolean = false) => {
+      // Check if this is a direct raw stat (matches a derived stat name)
+      if (allDerivedStats.includes(statType)) {
+        const adjustedValue = isNegative ? -value : value;
+        derivedDifferences[statType] += adjustedValue;
+        return;
+      }
+  
+      // Process primary stat conversions
+      statsData.forEach(row => {
+        if (row['Primary Stat'] === statType) {
+          const derivedStat = row['Derived Stat'];
+          const multiplier = Number(row[selectedClass]) || 0;
+          const adjustedValue = isNegative ? -value : value;
+          derivedDifferences[derivedStat] += adjustedValue * multiplier;
+        }
+      });
+    };
+  
+    // Process all stats from item 1 (negative contribution)
+    item1Stats.forEach(stat1 => {
+      if (!stat1.type || stat1.value === '') return;
+      processStat(stat1.type, Number(stat1.value), true);
+    });
+  
+    // Process all stats from item 2 (positive contribution)
+    item2Stats.forEach(stat2 => {
+      if (!stat2.type || stat2.value === '') return;
+      processStat(stat2.type, Number(stat2.value), false);
+    });
+  
+    // Filter out stats with no difference
+    return Object.fromEntries(
+      Object.entries(derivedDifferences)
+        .filter(([_, value]) => Math.abs(value) > 0.001)
+    );
   }, [statsData, selectedClass, item1Stats, item2Stats]);
 
   return (
