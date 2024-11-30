@@ -1,6 +1,7 @@
 LOTRO Tools Plugin
 
 A collection of useful tools for The Lord of the Rings Online (LOTRO) to enhance your gameplay experience, including stat calculations, item comparisons, and more.
+
 🚀 Features
 
     Stat Derivatives Calculator: Calculate derived stats based on your character's primary attributes.
