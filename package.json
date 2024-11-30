@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "predeploy": "npm run build",
-    "deploy": "touch ./out/.nojekyll && gh-pages -d out -t true"
+    "deploy": "touch ./out/.nojekyll && gh-pages -d out -t true",
+    "postdeploy": "rm -rf .next out"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.1.2",
