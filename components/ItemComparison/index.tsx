@@ -45,6 +45,7 @@ interface ItemSectionProps {
   onStatValueChange: (index: number, value: string) => void;
   onAddStat: () => void;
   onRemoveStat: (index: number) => void;
+  onTitleChange: (value: string) => void;  // Add this line
 }
 
 interface ComparisonResultProps {
@@ -126,11 +127,17 @@ const ItemSection: React.FC<ItemSectionProps> = ({
   onStatTypeChange,
   onStatValueChange,
   onAddStat,
-  onRemoveStat
+  onRemoveStat,
+  onTitleChange
 }) => (
   <Card className="w-full">
     <CardHeader>
-      <CardTitle>{title}</CardTitle>
+      <Input
+        value={title}
+        onChange={(e) => onTitleChange(e.target.value)}
+        className="font-semibold text-lg"
+        placeholder="Enter item name"
+      />
     </CardHeader>
     <CardContent className="space-y-4">
       {stats.map((stat, index) => (
@@ -217,6 +224,8 @@ const ItemComparison: React.FC = () => {
   const [item1Stats, setItem1Stats] = useState<StatData[]>([{ type: '', value: '' }]);
   const [item2Stats, setItem2Stats] = useState<StatData[]>([{ type: '', value: '' }]);
   const [statsData, setStatsData] = useState<StatsDataRow[]>([]);
+  const [item1Name, setItem1Name] = useState<string>('Item 1');  
+  const [item2Name, setItem2Name] = useState<string>('Item 2');  
 
   // Load stats data
   useEffect(() => {
@@ -302,8 +311,20 @@ const ItemComparison: React.FC = () => {
   //swap handler
   const handleSwapItems = () => {
     const tempStats = [...item1Stats];
+    const tempName = item1Name;
     setItem1Stats([...item2Stats]);
     setItem2Stats(tempStats);
+    setItem1Name(item2Name);
+    setItem2Name(tempName);
+  };
+
+  //item name handlers
+  const handleItem1NameChange = (value: string) => {
+    setItem1Name(value);
+  };
+
+  const handleItem2NameChange = (value: string) => {
+    setItem2Name(value);
   };
   
   // Calculate derived stats differences with selected class
@@ -359,46 +380,48 @@ const ItemComparison: React.FC = () => {
 
   return (
     <div className="w-full space-y-6">
-  <ClassSelector 
-    selectedClass={selectedClass}
-    classes={availableClasses}
-    onClassChange={setSelectedClass}
-  />
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <ItemSection
-      title="Item 1"
-      stats={item1Stats}
-      availableStats={availableStats}
-      onStatTypeChange={handleStatTypeChange1}
-      onStatValueChange={handleStatValueChange1}
-      onAddStat={handleAddStat1}
-      onRemoveStat={handleRemoveStat1}
-    />
-    <ItemSection
-      title="Item 2"
-      stats={item2Stats}
-      availableStats={availableStats}
-      onStatTypeChange={handleStatTypeChange2}
-      onStatValueChange={handleStatValueChange2}
-      onAddStat={handleAddStat2}
-      onRemoveStat={handleRemoveStat2}
-    />
-    <ComparisonResult 
-      derivedStats={calculateDerivedStats}
-      selectedClass={selectedClass}
-    />
-  </div>
-  <div className="flex justify-center">
-    <Button
-      onClick={handleSwapItems}
-      className="w-48"
-      variant="outline"
-    >
-      <ArrowUpDown className="h-4 w-4 mr-2" />
-      Swap Items
-    </Button>
-  </div>
-</div>
+      <ClassSelector 
+        selectedClass={selectedClass}
+        classes={availableClasses}
+        onClassChange={setSelectedClass}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ItemSection
+          title={item1Name}
+          stats={item1Stats}
+          availableStats={availableStats}
+          onStatTypeChange={handleStatTypeChange1}
+          onStatValueChange={handleStatValueChange1}
+          onAddStat={handleAddStat1}
+          onRemoveStat={handleRemoveStat1}
+          onTitleChange={handleItem1NameChange}
+        />
+        <ItemSection
+          title={item2Name}
+          stats={item2Stats}
+          availableStats={availableStats}
+          onStatTypeChange={handleStatTypeChange2}
+          onStatValueChange={handleStatValueChange2}
+          onAddStat={handleAddStat2}
+          onRemoveStat={handleRemoveStat2}
+          onTitleChange={handleItem2NameChange}
+        />
+        <ComparisonResult 
+          derivedStats={calculateDerivedStats}
+          selectedClass={selectedClass}
+        />
+      </div>
+      <div className="flex justify-center">
+        <Button
+          onClick={handleSwapItems}
+          className="w-48"
+          variant="outline"
+        >
+          <ArrowUpDown className="h-4 w-4 mr-2" />
+          Swap Items
+        </Button>
+      </div>
+    </div>
   );
 };
 
