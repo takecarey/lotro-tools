@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Minus, X } from 'lucide-react';
+import { Plus, Minus, X, ArrowUpDown} from 'lucide-react';
 import Papa from 'papaparse';
 
 // Type definitions
@@ -299,6 +299,13 @@ const ItemComparison: React.FC = () => {
     setItem2Stats(newStats);
   };
 
+  //swap handler
+  const handleSwapItems = () => {
+    const tempStats = [...item1Stats];
+    setItem1Stats([...item2Stats]);
+    setItem2Stats(tempStats);
+  };
+  
   // Calculate derived stats differences with selected class
   const calculateDerivedStats = useMemo(() => {
     if (!statsData.length || !selectedClass) return {};
@@ -352,36 +359,46 @@ const ItemComparison: React.FC = () => {
 
   return (
     <div className="w-full space-y-6">
-      <ClassSelector 
-        selectedClass={selectedClass}
-        classes={availableClasses}
-        onClassChange={setSelectedClass}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ItemSection
-          title="Item 1"
-          stats={item1Stats}
-          availableStats={availableStats}
-          onStatTypeChange={handleStatTypeChange1}
-          onStatValueChange={handleStatValueChange1}
-          onAddStat={handleAddStat1}
-          onRemoveStat={handleRemoveStat1}
-        />
-        <ItemSection
-          title="Item 2"
-          stats={item2Stats}
-          availableStats={availableStats}
-          onStatTypeChange={handleStatTypeChange2}
-          onStatValueChange={handleStatValueChange2}
-          onAddStat={handleAddStat2}
-          onRemoveStat={handleRemoveStat2}
-        />
-        <ComparisonResult 
-          derivedStats={calculateDerivedStats}
-          selectedClass={selectedClass}
-        />
-      </div>
-    </div>
+  <ClassSelector 
+    selectedClass={selectedClass}
+    classes={availableClasses}
+    onClassChange={setSelectedClass}
+  />
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <ItemSection
+      title="Item 1"
+      stats={item1Stats}
+      availableStats={availableStats}
+      onStatTypeChange={handleStatTypeChange1}
+      onStatValueChange={handleStatValueChange1}
+      onAddStat={handleAddStat1}
+      onRemoveStat={handleRemoveStat1}
+    />
+    <ItemSection
+      title="Item 2"
+      stats={item2Stats}
+      availableStats={availableStats}
+      onStatTypeChange={handleStatTypeChange2}
+      onStatValueChange={handleStatValueChange2}
+      onAddStat={handleAddStat2}
+      onRemoveStat={handleRemoveStat2}
+    />
+    <ComparisonResult 
+      derivedStats={calculateDerivedStats}
+      selectedClass={selectedClass}
+    />
+  </div>
+  <div className="flex justify-center">
+    <Button
+      onClick={handleSwapItems}
+      className="w-48"
+      variant="outline"
+    >
+      <ArrowUpDown className="h-4 w-4 mr-2" />
+      Swap Items
+    </Button>
+  </div>
+</div>
   );
 };
 
